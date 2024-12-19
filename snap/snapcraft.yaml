@@ -2,7 +2,8 @@ name: vulkan-demos
 version: "latest"
 base: core24
 summary: Vulkan debugging test apps
-description: TBD
+description: |
+  Stress-testing gpu-2404 for Vulkan apps.
 
 grade: stable
 confinement: strict
