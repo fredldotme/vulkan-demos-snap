@@ -1,0 +1,63 @@
+name: vulkan-demos
+version: "latest"
+base: core24
+summary: Vulkan debugging test apps
+description: TBD
+
+grade: stable
+confinement: strict
+
+layout:
+  /usr/share/drirc.d:
+    bind: $SNAP/gpu/drirc.d
+
+plugs:
+  gpu-2404:
+    interface: content
+    target: $SNAP/gpu-2404
+    default-provider: mesa-2404
+
+apps:
+  vkd3d-gears:
+    plugs:
+      - opengl
+      - wayland
+      - x11
+    command-chain:
+      - bin/gpu-2404-wrapper
+      - bin/wayland-launch
+    command: usr/bin/vkd3d-gears
+  vkd3d-triangle:
+    plugs:
+      - opengl
+      - wayland
+      - x11
+    command-chain:
+      - bin/gpu-2404-wrapper
+      - bin/wayland-launch
+    command: usr/bin/vkd3d-triangle
+
+parts:
+  scripts:
+    plugin: dump
+    source: scripts
+    stage-packages:
+      - inotify-tools
+
+  vkd3d-demos:
+    plugin: nil
+    source: .
+    stage-packages:
+      - vkd3d-demos
+
+  gpu-snap:
+    after:
+      - vkd3d-demos
+    source: https://github.com/canonical/gpu-snap.git
+    plugin: dump
+    override-prime: |
+      craftctl default
+      ${CRAFT_PART_SRC}/bin/gpu-2404-cleanup mesa-2404
+      rm -rf ${CRAFT_PRIME}/usr/share/{doc,man}
+    prime:
+      - bin/gpu-2404-wrapper
